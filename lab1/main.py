@@ -39,23 +39,17 @@ if __name__ == "__main__":
             accuracy[activation_name].append(calc_accuracy(training_labels, pred))
             loss[activation_name].append(calc_loss(training_labels, pred))
 
-    plt.figure(figsize=(12, 6))
+    fig, axs = plt.subplots(nrows=2, figsize=(15, 15))
+    for name in ACTIVATION_NAMES:
+        axs[0].plot(accuracy[name])
+        axs[0].legend(ACTIVATION_NAMES)
+        axs[0].set(ylabel='Accuracy')
+        axs[0].set(xlabel='Epochs')
 
-    plt.subplot(1, 2, 1)
-    for activation_name in ACTIVATION_NAMES:
-        plt.plot(EPOCH, accuracy[activation_name], label=activation_name)
-    plt.title('Accuracy vs Epochs')
-    plt.xlabel('Epochs')
-    plt.ylabel('Accuracy')
-    plt.legend()
-
-    plt.subplot(1, 2, 2)
-    for activation_name in ACTIVATION_NAMES:
-        plt.plot(EPOCH, loss[activation_name], label=activation_name)
-    plt.title('Loss vs Epochs')
-    plt.xlabel('Epochs')
-    plt.ylabel('Loss')
-    plt.legend()
+        axs[1].plot(loss[name])
+        axs[1].legend(ACTIVATION_NAMES)
+        axs[1].set(ylabel='Loss')
+        axs[1].set(xlabel='Epochs')
 
     plt.tight_layout()
     plt.savefig('accuracy_loss_plots.png')
