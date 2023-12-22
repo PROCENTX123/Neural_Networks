@@ -2,7 +2,9 @@ import numpy as np
 from tqdm import tqdm
 from data import training_data, test_data
 from perceptron import Perceptron
+from const import ACTIVATION_NAMES, EPOCH, accuracy, loss
 import matplotlib.pyplot as plt
+
 
 def calc_accuracy(training_labels, pred):
     correct = 0
@@ -14,23 +16,9 @@ def calc_accuracy(training_labels, pred):
 
     return accuracy
 
+
 def calc_loss(training_labels, pred):
     return np.mean((training_labels - pred) ** 2)
-
-
-ACTIVATION_NAMES = ['sigmoid', 'tan', 'relu']
-EPOCH = [10, 100, 200,  300, 400, 500, 600, 700, 800, 900, 1000]
-accuracy = {
-    'sigmoid': [],
-    'tan': [],
-    'relu': []
-}
-
-loss = {
-    'sigmoid': [],
-    'tan': [],
-    'relu': []
-}
 
 
 if __name__ == "__main__":
