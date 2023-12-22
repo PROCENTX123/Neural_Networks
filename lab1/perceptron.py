@@ -1,25 +1,26 @@
-import numpy as np
+from activation_func import sigmoid, sigmoid_derivative, tanh, tanh_derivative, ReLu, ReLu_derivative
+
 
 class Perceptron:
-    def __init__(self, input_size, activation_function='linear', learning_rate=0.01, epochs=100):
-        self.weights = np.zeros(input_size + 1)
+    def __init__(self, input_size, bias, epochs, activation_function, learning_rate=0.01):
+        self.weights = [0] * input_size
+        self.bias = bias
         self.learning_rate = learning_rate
         self.epochs = epochs
-        self.activation_function = self.get_activation_function(activation_function)
+        self.activation_function, self.derivative_function = self.get_activation_function(activation_function)
 
     def get_activation_function(self, name):
-        if name == 'linear':
-            return lambda x: x
-        elif name == 'sigmoid':
-            return lambda x: 1 / (1 + np.exp(-x))
+        if name == 'sigmoid':
+            return sigmoid, sigmoid_derivative
         elif name == 'tan':
-            return lambda x: np.tanh(x)
+            return tanh, tanh_derivative
         elif name == 'relu':
-            return lambda x: np.maximum(0, x)
-
+            return ReLu, ReLu_derivative
+        else:
+            raise NotImplementedError(f'Activation {name} not implementation')
 
     def predict(self, inputs):
-        summation = np.dot(inputs, self.weights[1:]) + self.weights[0]
+        summation = sum(x * w for x, w in zip(inputs, self.weights)) + self.bias
         return self.activation_function(summation)
 
     def train(self, training_inputs, labels):
@@ -27,14 +28,5 @@ class Perceptron:
             for inputs, label in zip(training_inputs, labels):
                 prediction = self.predict(inputs)
                 error = label - prediction
-                self.weights[1:] += self.learning_rate * error * inputs
-                self.weights[0] += self.learning_rate * error
-
-
-def make_perceptron():
-    perceptron_linear = Perceptron(input_size=25, activation_function='linear')
-    perceptron_sigmoid = Perceptron(input_size=25, activation_function='sigmoid')
-    perceptron_tan = Perceptron(input_size=25, activation_function='tan')
-    perceptron_relu = Perceptron(input_size=25, activation_function='relu')
-
-    return perceptron_linear, perceptron_sigmoid, perceptron_tan, perceptron_relu
+                self.weights += self.learning_rate * error * inputs
+                self.bias += self.learning_rate * error

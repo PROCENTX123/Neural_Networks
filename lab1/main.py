@@ -1,34 +1,74 @@
+import numpy as np
+from tqdm import tqdm
 from data import training_data, test_data
-from perceptron import make_perceptron
+from perceptron import Perceptron
+import matplotlib.pyplot as plt
+
+def calc_accuracy(training_labels, pred):
+    correct = 0
+    for i in range(len(training_labels)):
+        # if training_labels[i] == pred[i]:
+        if abs(training_labels[i] - pred[i]) < 0.15:
+            correct += 1
+    accuracy = correct / len(training_labels)
+
+    return accuracy
+
+def calc_loss(training_labels, pred):
+    return np.mean((training_labels - pred) ** 2)
 
 
-def train(training_inputs, training_labels):
-    perceptron_linear.train(training_inputs, training_labels)
-    perceptron_sigmoid.train(training_inputs, training_labels)
-    perceptron_tan.train(training_inputs, training_labels)
-    perceptron_relu.train(training_inputs, training_labels)
+ACTIVATION_NAMES = ['sigmoid', 'tan', 'relu']
+EPOCH = [10, 100, 200,  300, 400, 500, 600, 700, 800, 900, 1000]
+accuracy = {
+    'sigmoid': [],
+    'tan': [],
+    'relu': []
+}
+
+loss = {
+    'sigmoid': [],
+    'tan': [],
+    'relu': []
+}
 
 
 if __name__ == "__main__":
 
-    perceptron_linear, perceptron_sigmoid, perceptron_tan, perceptron_relu = make_perceptron()
-
-    #training_data
     training_inputs, training_labels = training_data()
 
-    #test_data
-    test_inputs, test_labels = test_data()
+    test_inputs = test_data()
 
-    # Train perceptrons
-    train(training_inputs, training_labels)
 
-    # Test predictions
-    predictions_linear = [perceptron_linear.predict(inputs) for inputs in test_inputs]
-    predictions_sigmoid = [perceptron_sigmoid.predict(inputs) for inputs in test_inputs]
-    predictions_tan = [perceptron_tan.predict(inputs) for inputs in test_inputs]
-    predictions_relu = [perceptron_relu.predict(inputs) for inputs in test_inputs]
+    for activation_name in ACTIVATION_NAMES:
+        for epoch in tqdm(EPOCH):
+            perceptron = Perceptron(input_size=25, bias=0, epochs=epoch, activation_function=activation_name)
 
-    print("Linear Activation:", predictions_linear)
-    print("Sigmoid Activation:", predictions_sigmoid)
-    print("Tanh Activation:", predictions_tan)
-    print("ReLU Activation:", predictions_relu)
+            perceptron.train(training_inputs, training_labels)
+
+            pred = [perceptron.predict(inputs) for inputs in test_inputs]
+
+            accuracy[activation_name].append(calc_accuracy(training_labels, pred))
+            loss[activation_name].append(calc_loss(training_labels, pred))
+
+    plt.figure(figsize=(12, 6))
+
+    plt.subplot(1, 2, 1)
+    for activation_name in ACTIVATION_NAMES:
+        plt.plot(EPOCH, accuracy[activation_name], label=activation_name)
+    plt.title('Accuracy vs Epochs')
+    plt.xlabel('Epochs')
+    plt.ylabel('Accuracy')
+    plt.legend()
+
+    plt.subplot(1, 2, 2)
+    for activation_name in ACTIVATION_NAMES:
+        plt.plot(EPOCH, loss[activation_name], label=activation_name)
+    plt.title('Loss vs Epochs')
+    plt.xlabel('Epochs')
+    plt.ylabel('Loss')
+    plt.legend()
+
+    plt.tight_layout()
+    plt.savefig('accuracy_loss_plots.png')
+    plt.show()
