@@ -7,13 +7,8 @@ import matplotlib.pyplot as plt
 
 
 def calc_accuracy(training_labels, pred):
-    correct = 0
-    for i in range(len(training_labels)):
-        # if training_labels[i] == pred[i]:
-        if abs(training_labels[i] - pred[i]) < 0.15:
-            correct += 1
+    correct = sum(1 for true, pred in zip(training_labels, pred) if int(round(pred)) == true)
     accuracy = correct / len(training_labels)
-
     return accuracy
 
 
@@ -22,13 +17,14 @@ def calc_loss(training_labels, pred):
 
 
 if __name__ == "__main__":
-
     training_inputs, training_labels = training_data()
-
     test_inputs = test_data()
-
+    test_labels = training_labels
 
     for activation_name in ACTIVATION_NAMES:
+        accuracy[activation_name] = []
+        loss[activation_name] = []
+
         for epoch in tqdm(EPOCH):
             perceptron = Perceptron(input_size=25, bias=0, epochs=epoch, activation_function=activation_name)
 
@@ -36,27 +32,21 @@ if __name__ == "__main__":
 
             pred = [perceptron.predict(inputs) for inputs in test_inputs]
 
-            accuracy[activation_name].append(calc_accuracy(training_labels, pred))
-            loss[activation_name].append(calc_loss(training_labels, pred))
+            accuracy[activation_name].append(calc_accuracy(test_labels, pred))
+            loss[activation_name].append(calc_loss(test_labels, pred))
 
-    plt.figure(figsize=(12, 6))
+    fig, axs = plt.subplots(nrows=2, figsize=(15, 15))
+    for name in ACTIVATION_NAMES:
+        axs[0].plot(EPOCH, accuracy[name], label=name)
+        axs[1].plot(EPOCH, loss[name], label=name)
 
-    plt.subplot(1, 2, 1)
-    for activation_name in ACTIVATION_NAMES:
-        plt.plot(EPOCH, accuracy[activation_name], label=activation_name)
-    plt.title('Accuracy vs Epochs')
-    plt.xlabel('Epochs')
-    plt.ylabel('Accuracy')
-    plt.legend()
+    axs[0].set(ylabel='Accuracy', xlabel='Epochs', title='Accuracy per Epoch')
+    axs[1].set(ylabel='Loss', xlabel='Epochs', title='Loss per Epoch')
 
-    plt.subplot(1, 2, 2)
-    for activation_name in ACTIVATION_NAMES:
-        plt.plot(EPOCH, loss[activation_name], label=activation_name)
-    plt.title('Loss vs Epochs')
-    plt.xlabel('Epochs')
-    plt.ylabel('Loss')
-    plt.legend()
+    for ax in axs:
+        ax.legend()
+        ax.grid(True)
 
     plt.tight_layout()
-    plt.savefig('accuracy_loss_plots.png')
+    plt.savefig('accuracy_loss_plots2.png')
     plt.show()
