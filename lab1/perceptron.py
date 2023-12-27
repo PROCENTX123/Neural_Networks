@@ -1,6 +1,7 @@
 from activation_func import sigmoid, sigmoid_derivative, tanh, tanh_derivative, ReLu, ReLu_derivative
 import numpy as np
 
+
 class Perceptron:
     def __init__(self, input_size, bias, epochs, activation_function, learning_rate=0.01):
         # Initialize weights with small random values instead of zeros to break symmetry
