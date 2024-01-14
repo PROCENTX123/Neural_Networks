@@ -210,15 +210,12 @@ def training_data():
 
     }
 
-    training_data = []
-    labels = []
+    labels = [[0 for _ in range(10)] for _ in range(len(data))]
+    for i, label in enumerate(data.keys()):
+        if label.isdigit():
+            labels[i][int(label)] = 1
 
-    for label, matrix in data.items():
-        flattened_matrix = matrix.flatten()
-        training_data.append(flattened_matrix)
-        labels.append(int(label.isdigit()))
-
-    return np.array(training_data), np.array(labels)
+    return np.array([matrix.flatten() for matrix in data.values()]), np.array(labels)
 
 
 def distort_char(char):

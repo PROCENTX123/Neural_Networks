@@ -3,10 +3,9 @@ import numpy as np
 
 
 class Perceptron:
-    def __init__(self, input_size, bias, epochs, activation_function, learning_rate=0.01):
-        # Initialize weights with small random values instead of zeros to break symmetry
-        self.weights = np.random.randn(input_size) * 0.01
-        self.bias = bias
+    def __init__(self, input_size, epochs, activation_function, learning_rate=0.01):
+        self.weights = np.random.rand(input_size, 10)
+        self.bias = np.random.rand(10)
         self.learning_rate = learning_rate
         self.epochs = epochs
         self.activation_function, self.derivative_function = self.get_activation_function(activation_function)
@@ -30,6 +29,5 @@ class Perceptron:
             for inputs, label in zip(training_inputs, labels):
                 prediction = self.predict(inputs)
                 error = label - prediction
-
-                self.weights += self.learning_rate * error * inputs * self.derivative_function(prediction)
+                self.weights += self.learning_rate * np.outer(inputs, error * self.derivative_function(prediction))
                 self.bias += self.learning_rate * error

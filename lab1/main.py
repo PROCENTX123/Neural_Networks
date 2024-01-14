@@ -7,9 +7,13 @@ import matplotlib.pyplot as plt
 
 
 def calc_accuracy(training_labels, pred):
-    correct = sum(1 for true, pred in zip(training_labels, pred) if int(round(pred)) == true)
+    correct = 0
+    for i, label in enumerate(training_labels):
+        prediction = np.round(pred[i]).astype(int)
+        correct += np.array_equal(label, prediction)
     accuracy = correct / len(training_labels)
     return accuracy
+
 
 
 def calc_loss(training_labels, pred):
@@ -26,7 +30,7 @@ if __name__ == "__main__":
         loss[activation_name] = []
 
         for epoch in tqdm(EPOCH):
-            perceptron = Perceptron(input_size=25, bias=0, epochs=epoch, activation_function=activation_name)
+            perceptron = Perceptron(input_size=len(training_inputs[0]), epochs=epoch, activation_function=activation_name)
 
             perceptron.train(training_inputs, training_labels)
 
@@ -48,5 +52,5 @@ if __name__ == "__main__":
         ax.grid(True)
 
     plt.tight_layout()
-    plt.savefig('accuracy_loss_plots2.png')
+    plt.savefig('accuracy_loss_plots100epochmax.png')
     plt.show()
